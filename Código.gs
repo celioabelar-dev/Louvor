@@ -3,11 +3,58 @@
  * BACKEND GOOGLE APPS SCRIPT
  */
 
-function doGet() {
-  return HtmlService.createHtmlOutputFromFile('Index')
-    .setTitle('Ministério de Louvor - IBPaz')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+// Lista de funções que o front-end tem permissão de chamar (segurança)
+var FUNCOES_PERMITIDAS = [
+  'autenticarUsuario',
+  'buscarConfigAviso',
+  'salvarConfigAviso',
+  'buscarTodosUsuarios',
+  'cadastrarNovoUsuario',
+  'buscarTodosGrupos',
+  'obterGrupoParaEdicao',
+  'salvarEdicaoGrupo',
+  'salvarGrupoBackend',
+  'buscarTodasMusicas',
+  'cadastrarNovaMusica',
+  'buscarEscalasDoMes',
+  'criarNovaEscala',
+  'buscarAgendaEstudio',
+  'agendarHorarioEstudio',
+  'registrarIndisponibilidade',
+  'buscarIndisponiveisPorMes',
+  'buscarTodosIntegrantes'
+];
+
+// Só pra testar se a API está no ar (abra a URL /exec no navegador)
+function doGet(e) {
+  return ContentService
+    .createTextOutput(JSON.stringify({ status: 'ok', mensagem: 'API do Ministério de Louvor - IBPaz Online' }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// Todas as chamadas do front-end passam por aqui
+function doPost(e) {
+  var resposta;
+  try {
+    var corpo = JSON.parse(e.postData.contents);
+    var nomeFuncao = corpo.fn;
+    var argumentos = corpo.args || [];
+
+    if (FUNCOES_PERMITIDAS.indexOf(nomeFuncao) === -1) {
+      throw new Error('Função não permitida ou inexistente: ' + nomeFuncao);
+    }
+
+    var funcaoAlvo = this[nomeFuncao];
+    var resultado = funcaoAlvo.apply(null, argumentos);
+
+    resposta = { sucesso: true, dados: resultado };
+  } catch (err) {
+    resposta = { sucesso: false, mensagem: err.message };
+  }
+
+  return ContentService
+    .createTextOutput(JSON.stringify(resposta))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 function configurarEstruturaInicial() {
