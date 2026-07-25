@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
+    <base target="_top">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ministério de Louvor - IBPaz</title>
-
+   
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -641,32 +642,7 @@
   </div> <!-- /appPrincipal -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-  // ==================================================
-  // CONFIGURAÇÃO DA API (GOOGLE APPS SCRIPT)
-  // ==================================================
-  // Troque pela URL da sua implantação do Apps Script (termina em /exec)
-  const API_URL = "https://script.google.com/macros/s/SUA_URL_AQUI/exec";
-
-  // Wrapper genérico para chamar qualquer função do backend.
-  // Uso: callAPI('nomeDaFuncao', [arg1, arg2]).then(dados => ...).catch(err => ...)
-  function callAPI(fn, args) {
-    return fetch(API_URL, {
-      method: 'POST',
-      // Não definir Content-Type como application/json de propósito:
-      // isso mantém a requisição como "simple request" e evita o preflight
-      // CORS (OPTIONS), que o Apps Script não trata bem.
-      body: JSON.stringify({ fn: fn, args: args || [] })
-    })
-    .then(function(response) { return response.json(); })
-    .then(function(res) {
-      if (!res.sucesso) {
-        throw new Error(res.mensagem || 'Erro desconhecido na API.');
-      }
-      return res.dados;
-    });
-  }
-
-  var usuarioLogado = null;
+      var usuarioLogado = null;
   var cacheUsuarios = [];
   var cacheIntegrantes = [];
   var listaIntegrantesParaGrupos = [];
@@ -699,8 +675,8 @@
     var user = document.getElementById('iptUsuario').value;
     var pass = document.getElementById('iptSenha').value;
 
-    callAPI('autenticarUsuario', [user, pass])
-      .then(function(res) {
+    google.script.run
+      .withSuccessHandler(function(res) {
         btn.disabled = false;
         btn.innerHTML = 'Entrar';
         if (res.sucesso) {
@@ -711,11 +687,12 @@
           alert(res.mensagem);
         }
       })
-      .catch(function(err) {
+      .withFailureHandler(function(err) {
         btn.disabled = false;
         btn.innerHTML = 'Entrar';
         alert("Erro no servidor: " + err.message);
-      });
+      })
+      .autenticarUsuario(user, pass);
   }
 
   // 3. FAZ O LOGOUT
@@ -776,8 +753,8 @@
   }
 
       function carregarAvisoHome() {
-        callAPI('buscarConfigAviso', [])
-          .then(function(listaAvisos) {
+        google.script.run
+          .withSuccessHandler(function(listaAvisos) {
             var container = document.getElementById('containerAvisosHome');
             if (!listaAvisos || listaAvisos.length === 0) {
               container.innerHTML = '';
@@ -810,14 +787,12 @@
             });
             container.innerHTML = html;
           })
-          .catch(function(err) {
-            console.error('Erro ao carregar avisos:', err);
-          });
+          .buscarConfigAviso();
       }
 
       function carregarEscalasHome() {
-        callAPI('buscarEscalasDoMes', [])
-          .then(function(listaEscalas) {
+        google.script.run
+          .withSuccessHandler(function(listaEscalas) {
             var container = document.getElementById('containerEscalasHome') || document.getElementById('listaEscalasMes');
             if (!container) return;
            
@@ -907,9 +882,7 @@
             html += '</div>';
             container.innerHTML = html;
           })
-          .catch(function(err) {
-            console.error('Erro ao carregar escalas:', err);
-          });
+          .buscarEscalasDoMes();
       }
 
       function salvarAgendamentoEstudio(e) {
@@ -920,65 +893,59 @@
           fim: document.getElementById('estudio_fim').value,
           responsavelId: usuarioLogado.id
         };
-        callAPI('agendarHorarioEstudio', [dados])
-          .then(function(res) {
+        google.script.run
+          .withSuccessHandler(function(res) {
             alert(res.mensagem);
             document.getElementById('formAgendarEstudio').reset();
             document.getElementById('estudio_responsavel').value = usuarioLogado.nome;
             carregarAgendaEstudio();
           })
-          .catch(function(err) {
-            alert('Erro ao salvar: ' + err.message);
-          });
+          .agendarHorarioEstudio(dados);
       }
 
       function carregarAgendaEstudio() {
-        callAPI('buscarAgendaEstudio', [])
-          .then(function(agenda) {
-            var container = document.getElementById('listaAgendaEstudio');
-            if (!agenda || agenda.length === 0) {
-              container.innerHTML = '<span class="text-muted small">Nenhum ensaio agendado.</span>';
-              return;
-            }
-            var html = '';
-            agenda.forEach(function(a) {
-              // Se a.grupo existir, exibe "Nome (Grupo)". Se não, só "Nome"
-              var respExibicao = a.grupo ? a.responsavelNome + ' (' + a.grupo + ')' : a.responsavelNome;
-
-              html += '<div class="p-2 border-bottom d-flex justify-content-between align-items-center" style="font-size: 12px;">' +
-                        '<div>' +
-                          '<strong>' + a.data + '</strong> (' + a.inicio + ' - ' + a.fim + ')<br>' +
-                          '<span class="text-muted">' + respExibicao + '</span>' +
-                        '</div>' +
-                        (a.responsavelTelefone ? '<a href="https://wa.me/' + a.responsavelTelefone + '" target="_blank" class="btn btn-sm btn-outline-success border-0"><i class="fa-brands fa-whatsapp"></i></a>' : '') +
-                      '</div>';
-            });
-            container.innerHTML = html;
-          })
-          .catch(function(err) {
-            console.error('Erro ao carregar agenda do estúdio:', err);
-          });
+  google.script.run
+    .withSuccessHandler(function(agenda) {
+      var container = document.getElementById('listaAgendaEstudio');
+      if (!agenda || agenda.length === 0) {
+        container.innerHTML = '<span class="text-muted small">Nenhum ensaio agendado.</span>';
+        return;
       }
+      var html = '';
+      agenda.forEach(function(a) {
+        // Se a.grupo existir, exibe "Nome (Grupo)". Se não, só "Nome"
+        var respExibicao = a.grupo ? a.responsavelNome + ' (' + a.grupo + ')' : a.responsavelNome;
+
+        html += '<div class="p-2 border-bottom d-flex justify-content-between align-items-center" style="font-size: 12px;">' +
+                  '<div>' +
+                    '<strong>' + a.data + '</strong> (' + a.inicio + ' - ' + a.fim + ')<br>' +
+                    '<span class="text-muted">' + respExibicao + '</span>' +
+                  '</div>' +
+                  (a.responsavelTelefone ? '<a href="https://wa.me/' + a.responsavelTelefone + '" target="_blank" class="btn btn-sm btn-outline-success border-0"><i class="fa-brands fa-whatsapp"></i></a>' : '') +
+                '</div>';
+      });
+      container.innerHTML = html;
+    })
+    .buscarAgendaEstudio();
+}
 
       function salvarIndisponibilidadeForm(e) {
         e.preventDefault();
         var dt = document.getElementById('indisp_data').value;
         var just = document.getElementById('indisp_justificativa').value;
-        callAPI('registrarIndisponibilidade', [usuarioLogado.id, dt, just])
-          .then(function(res) {
+        google.script.run
+          .withSuccessHandler(function(res) {
             alert(res.mensagem);
             document.getElementById('formIndisponibilidade').reset();
           })
-          .catch(function(err) {
-            alert('Erro ao salvar: ' + err.message);
-          });
+          .registrarIndisponibilidade(usuarioLogado.id, dt, just);
       }
 
       function carregarIndisponiveisDoMesAtual() {
         var mm = document.getElementById('escala_filtro_mes').value;
         var yyyy = document.getElementById('escala_filtro_ano').value;
-        callAPI('buscarIndisponiveisPorMes', [mm, yyyy])
-          .then(function(lista) {
+        google.script.run
+          .withSuccessHandler(function(lista) {
             var container = document.getElementById('listaIndisponiveisData');
             if (lista.length === 0) {
               container.innerHTML = '<li class="text-muted">Nenhum bloqueio para este mês.</li>';
@@ -990,46 +957,36 @@
             });
             container.innerHTML = html;
           })
-          .catch(function(err) {
-            console.error('Erro ao carregar indisponibilidades:', err);
-          });
+          .buscarIndisponiveisPorMes(mm, yyyy);
         carregarOpcoesMontarEscala();
       }
 
       function carregarOpcoesMontarEscala() {
-        callAPI('buscarTodosGrupos', [])
-          .then(function(grupos) {
-            var selectGrp = document.getElementById('escala_grupo');
-            selectGrp.innerHTML = '<option value="">Selecione o grupo...</option>';
-            grupos.forEach(function(g) {
-              selectGrp.innerHTML += '<option value="' + g.id + '">' + g.nome + '</option>';
-            });
-          })
-          .catch(function(err) {
-            console.error('Erro ao carregar grupos:', err);
+        google.script.run.withSuccessHandler(function(grupos) {
+          var selectGrp = document.getElementById('escala_grupo');
+          selectGrp.innerHTML = '<option value="">Selecione o grupo...</option>';
+          grupos.forEach(function(g) {
+            selectGrp.innerHTML += '<option value="' + g.id + '">' + g.nome + '</option>';
           });
+        }).buscarTodosGrupos();
 
-        callAPI('buscarTodasMusicas', [])
-          .then(function(musicas) {
-            var containerMus = document.getElementById('containerCheckMusicas');
-            if (musicas.length === 0) {
-              containerMus.innerHTML = '<span class="text-muted">Nenhuma música cadastrada.</span>';
-              return;
-            }
-            var html = '';
-            musicas.forEach(function(m) {
-              html += '<div class="form-check mb-1">' +
-                        '<input class="form-check-input chk-musica" type="checkbox" value="' + m.id + '" id="mus_' + m.id + '">' +
-                        '<label class="form-check-label" for="mus_' + m.id + '">' +
-                          m.titulo + ' <span class="text-muted">(' + m.artista + ')</span>' +
-                        '</label>' +
-                      '</div>';
-            });
-            containerMus.innerHTML = html;
-          })
-          .catch(function(err) {
-            console.error('Erro ao carregar músicas:', err);
+        google.script.run.withSuccessHandler(function(musicas) {
+          var containerMus = document.getElementById('containerCheckMusicas');
+          if (musicas.length === 0) {
+            containerMus.innerHTML = '<span class="text-muted">Nenhuma música cadastrada.</span>';
+            return;
+          }
+          var html = '';
+          musicas.forEach(function(m) {
+            html += '<div class="form-check mb-1">' +
+                      '<input class="form-check-input chk-musica" type="checkbox" value="' + m.id + '" id="mus_' + m.id + '">' +
+                      '<label class="form-check-label" for="mus_' + m.id + '">' +
+                        m.titulo + ' <span class="text-muted">(' + m.artista + ')</span>' +
+                      '</label>' +
+                    '</div>';
           });
+          containerMus.innerHTML = html;
+        }).buscarTodasMusicas();
       }
 
       function ajustarSeletorHorario(val) {
@@ -1059,15 +1016,13 @@
           grupoId: document.getElementById('escala_grupo').value,
           repertorio: musicasSelec
         };
-        callAPI('criarNovaEscala', [dadosEscala])
-          .then(function(res) {
+        google.script.run
+          .withSuccessHandler(function(res) {
             alert(res.mensagem);
             document.getElementById('formCriarEscala').reset();
             carregarEscalasHome();
           })
-          .catch(function(err) {
-            alert('Erro ao salvar escala: ' + err.message);
-          });
+          .criarNovaEscala(dadosEscala);
       }
 
       function carregarListaIntegrantes() {
@@ -1078,17 +1033,18 @@
             <i class="fa-solid fa-spinner fa-spin me-1"></i> Carregando equipe...
           </div>
         `;
-        callAPI('buscarTodosIntegrantes', [])
-          .then(function (usuarios) {
+        google.script.run
+          .withSuccessHandler(function (usuarios) {
             cacheIntegrantes = usuarios || [];
             renderizarListaIntegrantes(usuarios);
           })
-          .catch(function (err) {
+          .withFailureHandler(function (err) {
             console.error("Erro ao carregar usuários:", err);
             if (container) {
               container.innerHTML = `<div class="text-danger small py-2 text-center">Erro ao carregar lista de usuários.</div>`;
             }
-          });
+          })
+          .buscarTodosIntegrantes();
       }
 
       function renderizarListaIntegrantes(lista) {
@@ -1155,15 +1111,13 @@
           nivel: document.getElementById('int_nivel').value,
           funcao: document.getElementById('int_funcao').value
         };
-        callAPI('cadastrarNovoUsuario', [dados])
-          .then(function(res) {
+        google.script.run
+          .withSuccessHandler(function(res) {
             alert(res.mensagem);
             document.getElementById('formCadastrarIntegrante').reset();
             carregarListaIntegrantes();
           })
-          .catch(function(err) {
-            alert('Erro ao cadastrar: ' + err.message);
-          });
+          .cadastrarNovoUsuario(dados);
       }
 
       function carregarTelaGrupos() {
@@ -1171,20 +1125,21 @@
         if (containerLista) {
           containerLista.innerHTML = '<span class="text-muted small"><i class="fa-solid fa-spinner fa-spin me-1"></i> Carregando grupos...</span>';
         }
-        callAPI('buscarTodosIntegrantes', [])
-          .then(function (usuarios) {
+        google.script.run
+          .withSuccessHandler(function (usuarios) {
             listaIntegrantesParaGrupos = Array.isArray(usuarios) ? usuarios : [];
             carregarListaGruposCadastrados();
           })
-          .catch(function (err) {
+          .withFailureHandler(function (err) {
             console.error("Erro ao carregar lista de usuários:", err);
             carregarListaGruposCadastrados();
-          });
+          })
+          .buscarTodosIntegrantes();
       }
 
       function carregarListaGruposCadastrados() {
-        callAPI('buscarTodosGrupos', [])
-          .then(function(grupos) {
+        google.script.run
+          .withSuccessHandler(function(grupos) {
             var container = document.getElementById('containerListaGrupos');
             if (!container) return;
             if (!grupos || grupos.length === 0) {
@@ -1203,9 +1158,7 @@
             });
             container.innerHTML = html;
           })
-          .catch(function(err) {
-            console.error('Erro ao carregar lista de grupos:', err);
-          });
+          .buscarTodosGrupos();
       }
 
       function adicionarLinhaMembro(idUserSelecionado = '', funcaoInput = '') {
@@ -1260,15 +1213,12 @@
         const card = document.getElementById('cardFormGrupo');
         if (card) card.style.display = 'block';
         if (!listaIntegrantesParaGrupos || listaIntegrantesParaGrupos.length === 0) {
-          callAPI('buscarTodosIntegrantes', [])
-            .then(function (usuarios) {
+          google.script.run
+            .withSuccessHandler(function (usuarios) {
               listaIntegrantesParaGrupos = Array.isArray(usuarios) ? usuarios : [];
               adicionarLinhaMembro();
             })
-            .catch(function(err) {
-              console.error('Erro ao carregar integrantes:', err);
-              adicionarLinhaMembro();
-            });
+            .buscarTodosIntegrantes();
         } else {
           adicionarLinhaMembro();
         }
@@ -1297,20 +1247,21 @@
           }
         });
         const dadosGrupo = { id, nome, cor, status, membros };
-        callAPI('salvarGrupoBackend', [dadosGrupo])
-          .then(function(res) {
+        google.script.run
+          .withSuccessHandler(function(res) {
             alert('Grupo salvo com sucesso!');
             fecharFormGrupo();
             carregarTelaGrupos();
           })
-          .catch(function(err) {
+          .withFailureHandler(function(err) {
             alert('Erro ao salvar grupo: ' + err.message);
-          });
+          })
+          .salvarGrupoBackend(dadosGrupo);
       }
 
       function carregarListaMusicas() {
-        callAPI('buscarTodasMusicas', [])
-          .then(function(musicas) {
+        google.script.run
+          .withSuccessHandler(function(musicas) {
             var container = document.getElementById('listaMusicasRepertorio');
             if (musicas.length === 0) {
               container.innerHTML = '<span class="text-muted small">Nenhuma música no repertório.</span>';
@@ -1325,9 +1276,7 @@
             });
             container.innerHTML = html;
           })
-          .catch(function(err) {
-            console.error('Erro ao carregar músicas:', err);
-          });
+          .buscarTodasMusicas();
       }
 
       function salvarNovaMusicaForm(e) {
@@ -1341,15 +1290,13 @@
           cifra: document.getElementById('mus_cifra').value,
           video: document.getElementById('mus_video').value
         };
-        callAPI('cadastrarNovaMusica', [dados])
-          .then(function(res) {
+        google.script.run
+          .withSuccessHandler(function(res) {
             alert(res.mensagem);
             document.getElementById('formCadastrarMusica').reset();
             carregarListaMusicas();
           })
-          .catch(function(err) {
-            alert('Erro ao cadastrar música: ' + err.message);
-          });
+          .cadastrarNovaMusica(dados);
       }
 
       function salvarAvisoComAnexo(e) {
@@ -1361,41 +1308,36 @@
         var texto = document.getElementById('aviso_texto_input').value;
         var fileInput = document.getElementById('aviso_arquivo_input');
         var file = fileInput.files[0];
-
-        function restaurarBotao() {
-          btn.disabled = false;
-          btn.innerHTML = 'Publicar Banner na Home';
-        }
-
         if (file) {
           var reader = new FileReader();
           reader.onload = function(evt) {
             var base64 = evt.target.result;
-            callAPI('salvarConfigAviso', [slot, texto, base64, file.name, file.type])
-              .then(function(res) {
-                restaurarBotao();
+            google.script.run
+              .withSuccessHandler(function(res) {
+                btn.disabled = false;
+                btn.innerHTML = 'Publicar Banner na Home';
                 alert(res.mensagem);
                 document.getElementById('formGerenciarAviso').reset();
                 carregarAvisoHome();
               })
-              .catch(function(err) {
-                restaurarBotao();
+              .withFailureHandler(function(err) {
+                btn.disabled = false;
+                btn.innerHTML = 'Publicar Banner na Home';
                 alert("Erro ao salvar: " + err.message);
-              });
+              })
+              .salvarConfigAviso(slot, texto, base64, file.name, file.type);
           };
           reader.readAsDataURL(file);
         } else {
-          callAPI('salvarConfigAviso', [slot, texto, "", "", ""])
-            .then(function(res) {
-              restaurarBotao();
+          google.script.run
+            .withSuccessHandler(function(res) {
+              btn.disabled = false;
+              btn.innerHTML = 'Publicar Banner na Home';
               alert(res.mensagem);
               document.getElementById('formGerenciarAviso').reset();
               carregarAvisoHome();
             })
-            .catch(function(err) {
-              restaurarBotao();
-              alert("Erro ao salvar: " + err.message);
-            });
+            .salvarConfigAviso(slot, texto, "", "", "");
         }
       }
   </script>
