@@ -1,18 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
+    <base target="_top">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ministério de Louvor - IBPaz</title>
-
-    <!-- PWA: instalável e sem barra de navegação -->
-    <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#0d6efd">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Louvor IBPaz">
-    <link rel="apple-touch-icon" href="./icon-192.png">
-
+   
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -21,18 +14,24 @@
     --bg-color: #f8f9fa;
   }
   body {
-    background-color: var(--bg-color);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    user-select: none;
-    padding-bottom: 70px;
-  }
+  background-color: var(--bg-color);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  user-select: none;
+  padding-bottom: 70px;
+  /* Adicionados para garantir largura/altura total da janela */
+  margin: 0;
+  width: 100vw;
+  min-height: 100vh;
+}
   .login-container {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
+  min-height: 100vh;
+  width: 100%; /* Força o container a ocupar a tela inteira na horizontal */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
   .login-card {
     width: 100%;
     max-width: 380px;
@@ -223,8 +222,77 @@
     border-radius: 4px;
   }
 </style>
+<!-- ========================================== -->
+<!-- CONFIGURAÇÃO EXCLUSIVA DO PWA (TELA CHEIA E ÍCONE) -->
+<!-- ========================================== -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Louvor IBPAZ">
+
+<!-- ÍCONE PARA IPHONE (iOS) -->
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3844/3844721.png">
+
+<!-- MANIFESTO PWA AJUSTADO PARA OMITIR NAVEGADOR -->
+<link rel="manifest" href='data:application/manifest+json,{
+  "name": "Louvor IBPAZ",
+  "short_name": "IBPAZ",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8f9fa",
+  "theme_color": "#0d6efd",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3844/3844721.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3844/3844721.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}'>
   </head>
   <body>
+    
+    <!-- METAS PARA PWA E DISPOSITIVOS MÓVEIS -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d6efd">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- SUPORTE PARA APPLE / iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Louvor IBPAZ">
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3844/3844721.png">
+
+<!-- MANIFESTO PWA (Configuração Dinâmica via Data URI) -->
+<link rel="manifest" href='data:application/manifest+json,{
+  "name": "Louvor IBPAZ",
+  "short_name": "IBPAZ",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f8f9fa",
+  "theme_color": "#0d6efd",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3844/3844721.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3844/3844721.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}'>
+
   <!-- TELA DE LOGIN -->
   <div id="telaLogin" class="login-container">
     <div class="card login-card p-4">
@@ -295,7 +363,7 @@
           </li>
           <li class="nav-item">
             <button class="nav-link py-2 small fw-bold" id="tab-indisp-btn" data-bs-toggle="pill" data-bs-target="#sub-indisp" type="button">
-              <i class="fa-solid fa-calendar-xmark me-1"></i> Bloquear Data
+              <i class="fa-solid fa-calendar-xmark me-1"></i> Indisponibilidade de Data
             </button>
           </li>
         </ul>
@@ -334,7 +402,7 @@
           </div>
           <div class="tab-pane fade" id="sub-indisp" role="tabpanel">
             <div class="card border-0 shadow-sm p-3 rounded-3 mb-4">
-              <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-triangle-exclamation text-warning me-1"></i> Bloquear Minha Data</h6>
+              <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-triangle-exclamation text-warning me-1"></i>Data</h6>
               <form id="formIndisponibilidade" onsubmit="salvarIndisponibilidadeForm(event)">
                 <div class="mb-3">
                   <label class="form-label small fw-bold">Data de Indisponibilidade</label>
@@ -649,44 +717,7 @@
   </div> <!-- /appPrincipal -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-  // ==================================================
-  // CONFIGURAÇÃO DA API (GOOGLE APPS SCRIPT)
-  // ==================================================
-  // Troque pela URL da sua implantação do Apps Script (termina em /exec)
-  const API_URL = "https://script.google.com/macros/s/AKfycbxsp5DsjxXP3ETAQ8TiNXDS11iYPN9rTjIUIb7KRElxRf-xAxrCgLBbDNWM16ZaGm1p/exec";
-
-  // ==================================================
-  // REGISTRO DO SERVICE WORKER (PWA)
-  // ==================================================
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('./sw.js')
-        .catch(function (err) {
-          console.error('Erro ao registrar Service Worker:', err);
-        });
-    });
-  }
-
-  // Wrapper genérico para chamar qualquer função do backend.
-  // Uso: callAPI('nomeDaFuncao', [arg1, arg2]).then(dados => ...).catch(err => ...)
-  function callAPI(fn, args) {
-    return fetch(API_URL, {
-      method: 'POST',
-      // Não definir Content-Type como application/json de propósito:
-      // isso mantém a requisição como "simple request" e evita o preflight
-      // CORS (OPTIONS), que o Apps Script não trata bem.
-      body: JSON.stringify({ fn: fn, args: args || [] })
-    })
-    .then(function(response) { return response.json(); })
-    .then(function(res) {
-      if (!res.sucesso) {
-        throw new Error(res.mensagem || 'Erro desconhecido na API.');
-      }
-      return res.dados;
-    });
-  }
-
-  var usuarioLogado = null;
+      var usuarioLogado = null;
   var cacheUsuarios = [];
   var cacheIntegrantes = [];
   var listaIntegrantesParaGrupos = [];
@@ -709,63 +740,134 @@
     }
   }
 
+// 1. FUNÇÃO DEDICADA PARA EXIBIR A TELA DE LOGIN CENTRALIZADA
+function exibirTelaLogin() {
+  // Esconde o app e o menu mobile
+  var appPrincipal = document.getElementById('appPrincipal');
+  if (appPrincipal) appPrincipal.style.display = 'none';
+
+  var navMobile = document.querySelector('.nav-mobile');
+  if (navMobile) navMobile.style.setProperty('display', 'none', 'important');
+
+  // Exibe o login forçando a centralização via CSS inline
+  var telaLogin = document.getElementById('telaLogin');
+  if (telaLogin) {
+    telaLogin.style.cssText = "display: flex !important; align-items: center !important; justify-content: center !important; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 99999 !important; background-color: var(--bg-color, #f8f9fa) !important;";
+  }
+}
+
+// 2. VERIFICAÇÃO INICIAL AO CARREGAR A PÁGINA
+window.addEventListener('DOMContentLoaded', function() {
+  var sessaoSalva = localStorage.getItem('ibpaz_sessao');
+  
+  if (sessaoSalva) {
+    try {
+      usuarioLogado = JSON.parse(sessaoSalva);
+      iniciarAplicacao();
+    } catch (e) {
+      exibirTelaLogin();
+    }
+  } else {
+    exibirTelaLogin(); // Força a centralização logo no primeiro carregamento!
+  }
+});
+
   // 2. EXECUTA O LOGIN
-  function executarLogin(e) {
-    e.preventDefault();
-    var btn = document.getElementById('btnEntrar');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Entrando...';
+function executarLogin(e) {
+  if (e) e.preventDefault();
+  
+  var btn = document.getElementById('btnEntrar');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Entrando...';
 
-    var user = document.getElementById('iptUsuario').value;
-    var pass = document.getElementById('iptSenha').value;
+  var user = document.getElementById('iptUsuario').value;
+  var pass = document.getElementById('iptSenha').value;
 
-    callAPI('autenticarUsuario', [user, pass])
-      .then(function(res) {
-        btn.disabled = false;
-        btn.innerHTML = 'Entrar';
-        if (res.sucesso) {
-          usuarioLogado = res.usuario;
-          localStorage.setItem('ibpaz_sessao', JSON.stringify(usuarioLogado));
-          iniciarAplicacao();
-        } else {
-          alert(res.mensagem);
-        }
-      })
-      .catch(function(err) {
-        btn.disabled = false;
-        btn.innerHTML = 'Entrar';
-        alert("Erro no servidor: " + err.message);
-      });
+  google.script.run
+    .withSuccessHandler(function(res) {
+      btn.disabled = false;
+      btn.innerHTML = 'Entrar';
+      
+      if (res && res.sucesso) {
+        usuarioLogado = res.usuario;
+        localStorage.setItem('ibpaz_sessao', JSON.stringify(usuarioLogado));
+        iniciarAplicacao();
+      } else {
+        alert(res ? res.mensagem : "Erro ao efetuar login.");
+      }
+    })
+    .withFailureHandler(function(err) {
+      btn.disabled = false;
+      btn.innerHTML = 'Entrar';
+      alert("Erro de comunicação com o servidor: " + (err.message || err));
+    })
+    .autenticarUsuario(user, pass);
+}
+
+ // 3. FAZ O LOGOUT (Sem recarregar a página)
+function fazerLogout() {
+  // 1. Limpa os dados da sessão gravados no navegador
+  localStorage.removeItem('ibpaz_sessao');
+  usuarioLogado = null;
+
+  // 2. Esconde a interface do App e o menu inferior
+  var appPrincipal = document.getElementById('appPrincipal');
+  if (appPrincipal) {
+    appPrincipal.style.display = 'none';
   }
 
-  // 3. FAZ O LOGOUT
-  function fazerLogout() {
-    localStorage.removeItem('ibpaz_sessao');
-    location.reload();
+  var navMobile = document.querySelector('.nav-mobile');
+  if (navMobile) {
+    navMobile.style.setProperty('display', 'none', 'important');
   }
 
-  // 4. INICIA A APLICAÇÃO (APÓS LOGIN OU SESSÃO VÁLIDA)
-  function iniciarAplicacao() {
+  // 3. Limpa os campos de input do formulário de login
+  var iptUser = document.getElementById('iptUsuario');
+  var iptPass = document.getElementById('iptSenha');
+  if (iptUser) iptUser.value = '';
+  if (iptPass) iptPass.value = '';
+
+  // 4. Exibe a tela de login novamente
+  var telaLogin = document.getElementById('telaLogin');
+  if (telaLogin) {
+    telaLogin.style.setProperty('display', 'flex', 'important');
+  }
+}
+
+  // 4. INICIA A APLICAÇÃO
+function iniciarAplicacao() {
+  try {
     document.getElementById('telaLogin').style.display = 'none';
     document.getElementById('appPrincipal').style.display = 'block';
     
-    document.getElementById('nomeUsuarioHome').innerText = usuarioLogado.nome;
-    
-    // Formata o campo Responsável como "Nome (Grupo)"
-    var grupoTxt = usuarioLogado.grupo ? ' (' + usuarioLogado.grupo + ')' : '';
-    document.getElementById('estudio_responsavel').value = usuarioLogado.nome + grupoTxt;
-    
-    configurarNivelAcesso();
-    carregarAvisoHome();
-    carregarEscalasHome();
-    carregarAgendaEstudio();
-    
-    var hoje = new Date();
-    var mm = String(hoje.getMonth() + 1).padStart(2, '0');
-    var yyyy = String(hoje.getFullYear());
-    document.getElementById('escala_filtro_mes').value = mm;
-    document.getElementById('escala_filtro_ano').value = yyyy;
+    if (usuarioLogado) {
+      var elNome = document.getElementById('nomeUsuarioHome');
+      if (elNome) elNome.innerText = usuarioLogado.nome;
+      
+      var elResp = document.getElementById('estudio_responsavel');
+      if (elResp) {
+        var grupoTxt = usuarioLogado.grupo ? ' (' + usuarioLogado.grupo + ')' : '';
+        elResp.value = usuarioLogado.nome + grupoTxt;
+      }
+      
+      configurarNivelAcesso();
+      carregarAvisoHome();
+      carregarEscalasHome();
+      carregarAgendaEstudio();
+      
+      var hoje = new Date();
+      var mm = String(hoje.getMonth() + 1).padStart(2, '0');
+      var yyyy = String(hoje.getFullYear());
+      
+      var fMes = document.getElementById('escala_filtro_mes');
+      var fAno = document.getElementById('escala_filtro_ano');
+      if (fMes) fMes.value = mm;
+      if (fAno) fAno.value = yyyy;
+    }
+  } catch (err) {
+    console.error("Erro na inicialização da interface:", err);
   }
+}
 
   // 5. CONTROLA PERMISSÕES DE ACESSO
   function configurarNivelAcesso() {
@@ -796,8 +898,8 @@
   }
 
       function carregarAvisoHome() {
-        callAPI('buscarConfigAviso', [])
-          .then(function(listaAvisos) {
+        google.script.run
+          .withSuccessHandler(function(listaAvisos) {
             var container = document.getElementById('containerAvisosHome');
             if (!listaAvisos || listaAvisos.length === 0) {
               container.innerHTML = '';
@@ -830,14 +932,12 @@
             });
             container.innerHTML = html;
           })
-          .catch(function(err) {
-            console.error('Erro ao carregar avisos:', err);
-          });
+          .buscarConfigAviso();
       }
 
       function carregarEscalasHome() {
-        callAPI('buscarEscalasDoMes', [])
-          .then(function(listaEscalas) {
+        google.script.run
+          .withSuccessHandler(function(listaEscalas) {
             var container = document.getElementById('containerEscalasHome') || document.getElementById('listaEscalasMes');
             if (!container) return;
            
@@ -927,9 +1027,7 @@
             html += '</div>';
             container.innerHTML = html;
           })
-          .catch(function(err) {
-            console.error('Erro ao carregar escalas:', err);
-          });
+          .buscarEscalasDoMes();
       }
 
       function salvarAgendamentoEstudio(e) {
@@ -940,65 +1038,59 @@
           fim: document.getElementById('estudio_fim').value,
           responsavelId: usuarioLogado.id
         };
-        callAPI('agendarHorarioEstudio', [dados])
-          .then(function(res) {
+        google.script.run
+          .withSuccessHandler(function(res) {
             alert(res.mensagem);
             document.getElementById('formAgendarEstudio').reset();
             document.getElementById('estudio_responsavel').value = usuarioLogado.nome;
             carregarAgendaEstudio();
           })
-          .catch(function(err) {
-            alert('Erro ao salvar: ' + err.message);
-          });
+          .agendarHorarioEstudio(dados);
       }
 
       function carregarAgendaEstudio() {
-        callAPI('buscarAgendaEstudio', [])
-          .then(function(agenda) {
-            var container = document.getElementById('listaAgendaEstudio');
-            if (!agenda || agenda.length === 0) {
-              container.innerHTML = '<span class="text-muted small">Nenhum ensaio agendado.</span>';
-              return;
-            }
-            var html = '';
-            agenda.forEach(function(a) {
-              // Se a.grupo existir, exibe "Nome (Grupo)". Se não, só "Nome"
-              var respExibicao = a.grupo ? a.responsavelNome + ' (' + a.grupo + ')' : a.responsavelNome;
-
-              html += '<div class="p-2 border-bottom d-flex justify-content-between align-items-center" style="font-size: 12px;">' +
-                        '<div>' +
-                          '<strong>' + a.data + '</strong> (' + a.inicio + ' - ' + a.fim + ')<br>' +
-                          '<span class="text-muted">' + respExibicao + '</span>' +
-                        '</div>' +
-                        (a.responsavelTelefone ? '<a href="https://wa.me/' + a.responsavelTelefone + '" target="_blank" class="btn btn-sm btn-outline-success border-0"><i class="fa-brands fa-whatsapp"></i></a>' : '') +
-                      '</div>';
-            });
-            container.innerHTML = html;
-          })
-          .catch(function(err) {
-            console.error('Erro ao carregar agenda do estúdio:', err);
-          });
+  google.script.run
+    .withSuccessHandler(function(agenda) {
+      var container = document.getElementById('listaAgendaEstudio');
+      if (!agenda || agenda.length === 0) {
+        container.innerHTML = '<span class="text-muted small">Nenhum ensaio agendado.</span>';
+        return;
       }
+      var html = '';
+      agenda.forEach(function(a) {
+        // Se a.grupo existir, exibe "Nome (Grupo)". Se não, só "Nome"
+        var respExibicao = a.grupo ? a.responsavelNome + ' (' + a.grupo + ')' : a.responsavelNome;
+
+        html += '<div class="p-2 border-bottom d-flex justify-content-between align-items-center" style="font-size: 12px;">' +
+                  '<div>' +
+                    '<strong>' + a.data + '</strong> (' + a.inicio + ' - ' + a.fim + ')<br>' +
+                    '<span class="text-muted">' + respExibicao + '</span>' +
+                  '</div>' +
+                  (a.responsavelTelefone ? '<a href="https://wa.me/' + a.responsavelTelefone + '" target="_blank" class="btn btn-sm btn-outline-success border-0"><i class="fa-brands fa-whatsapp"></i></a>' : '') +
+                '</div>';
+      });
+      container.innerHTML = html;
+    })
+    .buscarAgendaEstudio();
+}
 
       function salvarIndisponibilidadeForm(e) {
         e.preventDefault();
         var dt = document.getElementById('indisp_data').value;
         var just = document.getElementById('indisp_justificativa').value;
-        callAPI('registrarIndisponibilidade', [usuarioLogado.id, dt, just])
-          .then(function(res) {
+        google.script.run
+          .withSuccessHandler(function(res) {
             alert(res.mensagem);
             document.getElementById('formIndisponibilidade').reset();
           })
-          .catch(function(err) {
-            alert('Erro ao salvar: ' + err.message);
-          });
+          .registrarIndisponibilidade(usuarioLogado.id, dt, just);
       }
 
       function carregarIndisponiveisDoMesAtual() {
         var mm = document.getElementById('escala_filtro_mes').value;
         var yyyy = document.getElementById('escala_filtro_ano').value;
-        callAPI('buscarIndisponiveisPorMes', [mm, yyyy])
-          .then(function(lista) {
+        google.script.run
+          .withSuccessHandler(function(lista) {
             var container = document.getElementById('listaIndisponiveisData');
             if (lista.length === 0) {
               container.innerHTML = '<li class="text-muted">Nenhum bloqueio para este mês.</li>';
@@ -1010,46 +1102,36 @@
             });
             container.innerHTML = html;
           })
-          .catch(function(err) {
-            console.error('Erro ao carregar indisponibilidades:', err);
-          });
+          .buscarIndisponiveisPorMes(mm, yyyy);
         carregarOpcoesMontarEscala();
       }
 
       function carregarOpcoesMontarEscala() {
-        callAPI('buscarTodosGrupos', [])
-          .then(function(grupos) {
-            var selectGrp = document.getElementById('escala_grupo');
-            selectGrp.innerHTML = '<option value="">Selecione o grupo...</option>';
-            grupos.forEach(function(g) {
-              selectGrp.innerHTML += '<option value="' + g.id + '">' + g.nome + '</option>';
-            });
-          })
-          .catch(function(err) {
-            console.error('Erro ao carregar grupos:', err);
+        google.script.run.withSuccessHandler(function(grupos) {
+          var selectGrp = document.getElementById('escala_grupo');
+          selectGrp.innerHTML = '<option value="">Selecione o grupo...</option>';
+          grupos.forEach(function(g) {
+            selectGrp.innerHTML += '<option value="' + g.id + '">' + g.nome + '</option>';
           });
+        }).buscarTodosGrupos();
 
-        callAPI('buscarTodasMusicas', [])
-          .then(function(musicas) {
-            var containerMus = document.getElementById('containerCheckMusicas');
-            if (musicas.length === 0) {
-              containerMus.innerHTML = '<span class="text-muted">Nenhuma música cadastrada.</span>';
-              return;
-            }
-            var html = '';
-            musicas.forEach(function(m) {
-              html += '<div class="form-check mb-1">' +
-                        '<input class="form-check-input chk-musica" type="checkbox" value="' + m.id + '" id="mus_' + m.id + '">' +
-                        '<label class="form-check-label" for="mus_' + m.id + '">' +
-                          m.titulo + ' <span class="text-muted">(' + m.artista + ')</span>' +
-                        '</label>' +
-                      '</div>';
-            });
-            containerMus.innerHTML = html;
-          })
-          .catch(function(err) {
-            console.error('Erro ao carregar músicas:', err);
+        google.script.run.withSuccessHandler(function(musicas) {
+          var containerMus = document.getElementById('containerCheckMusicas');
+          if (musicas.length === 0) {
+            containerMus.innerHTML = '<span class="text-muted">Nenhuma música cadastrada.</span>';
+            return;
+          }
+          var html = '';
+          musicas.forEach(function(m) {
+            html += '<div class="form-check mb-1">' +
+                      '<input class="form-check-input chk-musica" type="checkbox" value="' + m.id + '" id="mus_' + m.id + '">' +
+                      '<label class="form-check-label" for="mus_' + m.id + '">' +
+                        m.titulo + ' <span class="text-muted">(' + m.artista + ')</span>' +
+                      '</label>' +
+                    '</div>';
           });
+          containerMus.innerHTML = html;
+        }).buscarTodasMusicas();
       }
 
       function ajustarSeletorHorario(val) {
@@ -1079,15 +1161,13 @@
           grupoId: document.getElementById('escala_grupo').value,
           repertorio: musicasSelec
         };
-        callAPI('criarNovaEscala', [dadosEscala])
-          .then(function(res) {
+        google.script.run
+          .withSuccessHandler(function(res) {
             alert(res.mensagem);
             document.getElementById('formCriarEscala').reset();
             carregarEscalasHome();
           })
-          .catch(function(err) {
-            alert('Erro ao salvar escala: ' + err.message);
-          });
+          .criarNovaEscala(dadosEscala);
       }
 
       function carregarListaIntegrantes() {
@@ -1098,17 +1178,18 @@
             <i class="fa-solid fa-spinner fa-spin me-1"></i> Carregando equipe...
           </div>
         `;
-        callAPI('buscarTodosIntegrantes', [])
-          .then(function (usuarios) {
+        google.script.run
+          .withSuccessHandler(function (usuarios) {
             cacheIntegrantes = usuarios || [];
             renderizarListaIntegrantes(usuarios);
           })
-          .catch(function (err) {
+          .withFailureHandler(function (err) {
             console.error("Erro ao carregar usuários:", err);
             if (container) {
               container.innerHTML = `<div class="text-danger small py-2 text-center">Erro ao carregar lista de usuários.</div>`;
             }
-          });
+          })
+          .buscarTodosIntegrantes();
       }
 
       function renderizarListaIntegrantes(lista) {
@@ -1175,15 +1256,13 @@
           nivel: document.getElementById('int_nivel').value,
           funcao: document.getElementById('int_funcao').value
         };
-        callAPI('cadastrarNovoUsuario', [dados])
-          .then(function(res) {
+        google.script.run
+          .withSuccessHandler(function(res) {
             alert(res.mensagem);
             document.getElementById('formCadastrarIntegrante').reset();
             carregarListaIntegrantes();
           })
-          .catch(function(err) {
-            alert('Erro ao cadastrar: ' + err.message);
-          });
+          .cadastrarNovoUsuario(dados);
       }
 
       function carregarTelaGrupos() {
@@ -1191,20 +1270,21 @@
         if (containerLista) {
           containerLista.innerHTML = '<span class="text-muted small"><i class="fa-solid fa-spinner fa-spin me-1"></i> Carregando grupos...</span>';
         }
-        callAPI('buscarTodosIntegrantes', [])
-          .then(function (usuarios) {
+        google.script.run
+          .withSuccessHandler(function (usuarios) {
             listaIntegrantesParaGrupos = Array.isArray(usuarios) ? usuarios : [];
             carregarListaGruposCadastrados();
           })
-          .catch(function (err) {
+          .withFailureHandler(function (err) {
             console.error("Erro ao carregar lista de usuários:", err);
             carregarListaGruposCadastrados();
-          });
+          })
+          .buscarTodosIntegrantes();
       }
 
       function carregarListaGruposCadastrados() {
-        callAPI('buscarTodosGrupos', [])
-          .then(function(grupos) {
+        google.script.run
+          .withSuccessHandler(function(grupos) {
             var container = document.getElementById('containerListaGrupos');
             if (!container) return;
             if (!grupos || grupos.length === 0) {
@@ -1223,9 +1303,7 @@
             });
             container.innerHTML = html;
           })
-          .catch(function(err) {
-            console.error('Erro ao carregar lista de grupos:', err);
-          });
+          .buscarTodosGrupos();
       }
 
       function adicionarLinhaMembro(idUserSelecionado = '', funcaoInput = '') {
@@ -1280,15 +1358,12 @@
         const card = document.getElementById('cardFormGrupo');
         if (card) card.style.display = 'block';
         if (!listaIntegrantesParaGrupos || listaIntegrantesParaGrupos.length === 0) {
-          callAPI('buscarTodosIntegrantes', [])
-            .then(function (usuarios) {
+          google.script.run
+            .withSuccessHandler(function (usuarios) {
               listaIntegrantesParaGrupos = Array.isArray(usuarios) ? usuarios : [];
               adicionarLinhaMembro();
             })
-            .catch(function(err) {
-              console.error('Erro ao carregar integrantes:', err);
-              adicionarLinhaMembro();
-            });
+            .buscarTodosIntegrantes();
         } else {
           adicionarLinhaMembro();
         }
@@ -1317,20 +1392,21 @@
           }
         });
         const dadosGrupo = { id, nome, cor, status, membros };
-        callAPI('salvarGrupoBackend', [dadosGrupo])
-          .then(function(res) {
+        google.script.run
+          .withSuccessHandler(function(res) {
             alert('Grupo salvo com sucesso!');
             fecharFormGrupo();
             carregarTelaGrupos();
           })
-          .catch(function(err) {
+          .withFailureHandler(function(err) {
             alert('Erro ao salvar grupo: ' + err.message);
-          });
+          })
+          .salvarGrupoBackend(dadosGrupo);
       }
 
       function carregarListaMusicas() {
-        callAPI('buscarTodasMusicas', [])
-          .then(function(musicas) {
+        google.script.run
+          .withSuccessHandler(function(musicas) {
             var container = document.getElementById('listaMusicasRepertorio');
             if (musicas.length === 0) {
               container.innerHTML = '<span class="text-muted small">Nenhuma música no repertório.</span>';
@@ -1345,9 +1421,7 @@
             });
             container.innerHTML = html;
           })
-          .catch(function(err) {
-            console.error('Erro ao carregar músicas:', err);
-          });
+          .buscarTodasMusicas();
       }
 
       function salvarNovaMusicaForm(e) {
@@ -1361,15 +1435,13 @@
           cifra: document.getElementById('mus_cifra').value,
           video: document.getElementById('mus_video').value
         };
-        callAPI('cadastrarNovaMusica', [dados])
-          .then(function(res) {
+        google.script.run
+          .withSuccessHandler(function(res) {
             alert(res.mensagem);
             document.getElementById('formCadastrarMusica').reset();
             carregarListaMusicas();
           })
-          .catch(function(err) {
-            alert('Erro ao cadastrar música: ' + err.message);
-          });
+          .cadastrarNovaMusica(dados);
       }
 
       function salvarAvisoComAnexo(e) {
@@ -1381,41 +1453,36 @@
         var texto = document.getElementById('aviso_texto_input').value;
         var fileInput = document.getElementById('aviso_arquivo_input');
         var file = fileInput.files[0];
-
-        function restaurarBotao() {
-          btn.disabled = false;
-          btn.innerHTML = 'Publicar Banner na Home';
-        }
-
         if (file) {
           var reader = new FileReader();
           reader.onload = function(evt) {
             var base64 = evt.target.result;
-            callAPI('salvarConfigAviso', [slot, texto, base64, file.name, file.type])
-              .then(function(res) {
-                restaurarBotao();
+            google.script.run
+              .withSuccessHandler(function(res) {
+                btn.disabled = false;
+                btn.innerHTML = 'Publicar Banner na Home';
                 alert(res.mensagem);
                 document.getElementById('formGerenciarAviso').reset();
                 carregarAvisoHome();
               })
-              .catch(function(err) {
-                restaurarBotao();
+              .withFailureHandler(function(err) {
+                btn.disabled = false;
+                btn.innerHTML = 'Publicar Banner na Home';
                 alert("Erro ao salvar: " + err.message);
-              });
+              })
+              .salvarConfigAviso(slot, texto, base64, file.name, file.type);
           };
           reader.readAsDataURL(file);
         } else {
-          callAPI('salvarConfigAviso', [slot, texto, "", "", ""])
-            .then(function(res) {
-              restaurarBotao();
+          google.script.run
+            .withSuccessHandler(function(res) {
+              btn.disabled = false;
+              btn.innerHTML = 'Publicar Banner na Home';
               alert(res.mensagem);
               document.getElementById('formGerenciarAviso').reset();
               carregarAvisoHome();
             })
-            .catch(function(err) {
-              restaurarBotao();
-              alert("Erro ao salvar: " + err.message);
-            });
+            .salvarConfigAviso(slot, texto, "", "", "");
         }
       }
   </script>

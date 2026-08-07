@@ -3,58 +3,13 @@
  * BACKEND GOOGLE APPS SCRIPT
  */
 
-// Lista de funções que o front-end tem permissão de chamar (segurança)
-var FUNCOES_PERMITIDAS = [
-  'autenticarUsuario',
-  'buscarConfigAviso',
-  'salvarConfigAviso',
-  'buscarTodosUsuarios',
-  'cadastrarNovoUsuario',
-  'buscarTodosGrupos',
-  'obterGrupoParaEdicao',
-  'salvarEdicaoGrupo',
-  'salvarGrupoBackend',
-  'buscarTodasMusicas',
-  'cadastrarNovaMusica',
-  'buscarEscalasDoMes',
-  'criarNovaEscala',
-  'buscarAgendaEstudio',
-  'agendarHorarioEstudio',
-  'registrarIndisponibilidade',
-  'buscarIndisponiveisPorMes',
-  'buscarTodosIntegrantes'
-];
-
-// Só pra testar se a API está no ar (abra a URL /exec no navegador)
-function doGet(e) {
-  return ContentService
-    .createTextOutput(JSON.stringify({ status: 'ok', mensagem: 'API do Ministério de Louvor - IBPaz Online' }))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-// Todas as chamadas do front-end passam por aqui
-function doPost(e) {
-  var resposta;
-  try {
-    var corpo = JSON.parse(e.postData.contents);
-    var nomeFuncao = corpo.fn;
-    var argumentos = corpo.args || [];
-
-    if (FUNCOES_PERMITIDAS.indexOf(nomeFuncao) === -1) {
-      throw new Error('Função não permitida ou inexistente: ' + nomeFuncao);
-    }
-
-    var funcaoAlvo = this[nomeFuncao];
-    var resultado = funcaoAlvo.apply(null, argumentos);
-
-    resposta = { sucesso: true, dados: resultado };
-  } catch (err) {
-    resposta = { sucesso: false, mensagem: err.message };
-  }
-
-  return ContentService
-    .createTextOutput(JSON.stringify(resposta))
-    .setMimeType(ContentService.MimeType.JSON);
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('Index')
+    .setTitle('Ministério de Louvor - IBPaz')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
+    .addMetaTag('mobile-web-app-capable', 'yes')
+    .addMetaTag('apple-mobile-web-app-capable', 'yes')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 function configurarEstruturaInicial() {
@@ -92,47 +47,55 @@ function configurarEstruturaInicial() {
 }
 
 function autenticarUsuario(usuario, senha) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const aba = ss.getSheetByName('DB_USUARIOS');
-  if (!aba) return { sucesso: false, mensagem: "Banco de dados não configurado." };
-  
-  const dados = aba.getDataRange().getDisplayValues();
-  
-  for (let i = 1; i < dados.length; i++) {
-    if (dados[i][2].toString().toLowerCase() === usuario.toString().toLowerCase() && dados[i][3] === senha) {
-      
-      const idUsuario = dados[i][0];
-      let nomeGrupo = "Geral"; // Caso o usuário não esteja vinculado a nenhum grupo
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const aba = ss.getSheetByName('DB_USUARIOS');
+    if (!aba) return { sucesso: false, mensagem: "Aba DB_USUARIOS não encontrada no banco." };
+    
+    const dados = aba.getDataRange().getDisplayValues();
+    
+    for (let i = 1; i < dados.length; i++) {
+      const userLogin = dados[i][2] ? dados[i][2].toString().trim().toLowerCase() : "";
+      const userSenha = dados[i][3] ? dados[i][3].toString().trim() : "";
 
-      // Busca qual é o Grupo do Usuário na aba DB_GRUPOS
-      const abaGrupos = ss.getSheetByName('DB_GRUPOS');
-      if (abaGrupos) {
-        const dadosG = abaGrupos.getDataRange().getDisplayValues();
-        for (let g = 1; g < dadosG.length; g++) {
-          // Coluna C (índice 2) é onde fica o ID do Membro
-          if (dadosG[g][2].toString().trim() === idUsuario.toString().trim()) {
-            nomeGrupo = dadosG[g][1]; // Coluna B (índice 1) é o Nome do Grupo
-            break;
+      if (userLogin === usuario.toString().trim().toLowerCase() && userSenha === senha.toString().trim()) {
+        
+        const idUsuario = dados[i][0];
+        let nomeGrupo = "Geral"; // Grupo padrão se não estiver em nenhum grupo
+
+        // Busca qual é o Grupo do Usuário na aba DB_GRUPOS
+        const abaGrupos = ss.getSheetByName('DB_GRUPOS');
+        if (abaGrupos && abaGrupos.getLastRow() > 1) {
+          const dadosG = abaGrupos.getDataRange().getDisplayValues();
+          for (let g = 1; g < dadosG.length; g++) {
+            // Coluna C (índice 2) é o ID do Membro
+            if (dadosG[g][2] && dadosG[g][2].toString().trim() === idUsuario.toString().trim()) {
+              nomeGrupo = dadosG[g][1] ? dadosG[g][1].toString().trim() : "Geral"; // Coluna B
+              break;
+            }
           }
         }
-      }
 
-      return {
-        sucesso: true,
-        usuario: {
-          id: idUsuario,
-          nome: dados[i][1],
-          login: dados[i][2],
-          nivel: parseInt(dados[i][4]),
-          funcao: dados[i][5],
-          telefone: dados[i][6],
-          grupo: nomeGrupo // <-- Adicionado o grupo no retorno
-        }
-      };
+        return {
+          sucesso: true,
+          usuario: {
+            id: idUsuario,
+            nome: dados[i][1],
+            login: dados[i][2],
+            nivel: parseInt(dados[i][4]) || 3,
+            funcao: dados[i][5] || "",
+            telefone: dados[i][6] || "",
+            grupo: nomeGrupo
+          }
+        };
+      }
     }
+    
+    return { sucesso: false, mensagem: "Usuário ou senha incorretos." };
+
+  } catch (erro) {
+    return { sucesso: false, mensagem: "Erro no servidor: " + erro.toString() };
   }
-  
-  return { sucesso: false, mensagem: "Usuário ou senha incorretos." };
 }
 
 function buscarConfigAviso() {
